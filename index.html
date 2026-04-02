@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Genre Map</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #1e1e1e;
+      overflow: hidden;
+      font-family: Arial;
+      color: white;
+    }
+
+    #map {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      transition: transform 0.5s ease;
+    }
+
+    .node {
+      position: absolute;
+      padding: 10px 15px;
+      background: #333;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .node:hover {
+      background: #555;
+      transform: scale(1.1);
+    }
+
+    .tooltip {
+      position: absolute;
+      background: black;
+      padding: 5px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      display: none;
+      white-space: nowrap;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script>
+const data = {
+  name: "Genres",
+  children: [
+    {
+      name: "Metal",
+      desc: "Heavy and aggressive music",
+      children: [
+        {
+          name: "Black Metal",
+          desc: "Dark, atmospheric metal",
+          children: [
+            { name: "DSBM", desc: "Depressive black metal" }
+          ]
+        },
+        { name: "Death Metal", desc: "Brutal and fast" }
+      ]
+    },
+    {
+      name: "Rap",
+      desc: "Rhythmic spoken lyrics",
+      children: [
+        { name: "Trap", desc: "808-heavy modern rap" }
+      ]
+    },
+    {
+      name: "Pop",
+      desc: "Popular and catchy music"
+    }
+  ]
+};
+
+const map = document.getElementById("map");
+
+function createNode(node, x, y, level = 0) {
+  const el = document.createElement("div");
+  el.className = "node";
+  el.innerText = node.name;
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+
+  // Tooltip
+  const tooltip = document.createElement("div");
+  tooltip.className = "tooltip";
+  tooltip.innerText = node.desc || "";
+  document.body.appendChild(tooltip);
+
+  el.onmouseenter = (e) => {
+    if (node.desc) {
+      tooltip.style.display = "block";
+      tooltip.style.left = e.pageX + 10 + "px";
+      tooltip.style.top = e.pageY + 10 + "px";
+    }
+  };
+
+  el.onmouseleave = () => {
+    tooltip.style.display = "none";
+  };
+
+  el.onclick = () => {
+    expand(node, x, y, level);
+    zoomTo(x, y);
+  };
+
+  map.appendChild(el);
+}
+
+function expand(node, x, y, level) {
+  if (!node.children) return;
+
+  const radius = 120 + level * 40;
+
+  node.children.forEach((child, i) => {
+    const angle = (i / node.children.length) * Math.PI * 2;
+    const newX = x + Math.cos(angle) * radius;
+    const newY = y + Math.sin(angle) * radius;
+
+    createNode(child, newX, newY, level + 1);
+  });
+}
+
+function zoomTo(x, y) {
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+
+  const offsetX = centerX - x;
+  const offsetY = centerY - y;
+
+  map.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(1.2)`;
+}
+
+// Initial nodes
+data.children.forEach((node, i) => {
+  createNode(node, 300 + i * 200, 300);
+});
+</script>
+
+</body>
+</html>
