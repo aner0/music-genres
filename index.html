@@ -21,16 +21,19 @@
 
     .node {
       position: absolute;
-      padding: 10px 15px;
-      background: #333;
-      border-radius: 10px;
+      padding: 16px 26px; /* bigger body */
+      background: #2a2a2a;
+      border-radius: 14px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.25s;
+
+      border: 1px solid #555; /* thin border */
     }
 
     .node:hover {
-      background: #555;
-      transform: scale(1.1);
+      background: #3a3a3a;
+      border-color: #888;
+      transform: scale(1.08);
     }
 
     .tooltip {
@@ -120,17 +123,37 @@ function createNode(node, x, y, level = 0) {
 function expand(node, x, y, level) {
   if (!node.children) return;
 
-  const radius = 120 + level * 40;
+  const spacingX = 160;
+  const spacingY = 120;
+
+  const totalWidth = (node.children.length - 1) * spacingX;
 
   node.children.forEach((child, i) => {
-    const angle = (i / node.children.length) * Math.PI * 2;
-    const newX = x + Math.cos(angle) * radius;
-    const newY = y + Math.sin(angle) * radius;
+    const newX = x - totalWidth / 2 + i * spacingX;
+    const newY = y + spacingY;
 
     createNode(child, newX, newY, level + 1);
+
+    drawLine(x, y, newX, newY);
   });
 }
+function drawLine(x1, y1, x2, y2) {
+  const line = document.createElement("div");
 
+  const length = Math.hypot(x2 - x1, y2 - y1);
+  const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+
+  line.style.position = "absolute";
+  line.style.width = length + "px";
+  line.style.height = "2px";
+  line.style.background = "#666";
+  line.style.left = x1 + "px";
+  line.style.top = y1 + "px";
+  line.style.transformOrigin = "0 0";
+  line.style.transform = `rotate(${angle}deg)`;
+
+  map.appendChild(line);
+}
 function zoomTo(x, y) {
   const centerX = window.innerWidth / 2;
   const centerY = window.innerHeight / 2;
@@ -143,7 +166,7 @@ function zoomTo(x, y) {
 
 // Initial nodes
 data.children.forEach((node, i) => {
-  createNode(node, 300 + i * 200, 300);
+  createNode(node, window.innerWidth / 2, 150);
 });
 </script>
 
