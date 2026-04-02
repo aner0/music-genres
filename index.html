@@ -45,6 +45,10 @@
       display: none;
       white-space: nowrap;
     }
+    
+    line {
+      background: #555;
+    }
   </style>
 
 </head>
@@ -64,6 +68,7 @@ const data = {
         {
           name: "Black Metal",
           desc: "Dark, atmospheric metal",
+          color: "#3b0a45"
           children: [
             { name: "DSBM", desc: "Depressive black metal" }
           ]
@@ -71,17 +76,6 @@ const data = {
         { name: "Death Metal", desc: "Brutal and fast" }
       ]
     },
-    {
-      name: "Rap",
-      desc: "Rhythmic spoken lyrics",
-      children: [
-        { name: "Trap", desc: "808-heavy modern rap" }
-      ]
-    },
-    {
-      name: "Pop",
-      desc: "Popular and catchy music"
-    }
   ]
 };
 
@@ -113,18 +107,24 @@ function createNode(node, x, y, level = 0) {
   };
 
   el.onclick = () => {
-    expand(node, x, y, level);
-    zoomTo(x, y);
+    if (node.children) {
+      expand(node, x, y, level, el);
+      zoomTo(x, y);
+    }
   };
-
+  
+  if (node.color) {
+    el.style.background = node.color;
+  }
   map.appendChild(el);
+  return el;
 }
 
-function expand(node, x, y, level) {
+function expand(node, x, y, level, parentEl) {
   if (!node.children) return;
 
-  const spacingX = 160;
-  const spacingY = 120;
+  const spacingX = 180;
+  const spacingY = 140;
 
   const totalWidth = (node.children.length - 1) * spacingX;
 
@@ -132,28 +132,49 @@ function expand(node, x, y, level) {
     const newX = x - totalWidth / 2 + i * spacingX;
     const newY = y + spacingY;
 
-    createNode(child, newX, newY, level + 1);
+    const childEl = createNode(child, newX, newY, level + 1);
 
-    drawLine(x, y, newX, newY);
+    drawLine(x, y, newX, newY, parentEl, childEl);
+
+    // only zoom if it HAS children
+    childEl.onclick = () => {
+      if (child.children) {
+        expand(child, newX, newY, level + 1, childEl);
+        zoomTo(newX, newY);
+      }
+    };
   });
 }
-function drawLine(x1, y1, x2, y2) {
+  
+function drawLine(x1, y1, x2, y2, parentEl, childEl) {
+  const rect1 = parentEl.getBoundingClientRect();
+  const rect2 = childEl.getBoundingClientRect();
+
+  const mapRect = map.getBoundingClientRect();
+
+  const startX = rect1.left + rect1.width / 2 - mapRect.left;
+  const startY = rect1.top + rect1.height / 2 - mapRect.top;
+
+  const endX = rect2.left + rect2.width / 2 - mapRect.left;
+  const endY = rect2.top + rect2.height / 2 - mapRect.top;
+
   const line = document.createElement("div");
 
-  const length = Math.hypot(x2 - x1, y2 - y1);
-  const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+  const length = Math.hypot(endX - startX, endY - startY);
+  const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
 
   line.style.position = "absolute";
   line.style.width = length + "px";
   line.style.height = "2px";
   line.style.background = "#666";
-  line.style.left = x1 + "px";
-  line.style.top = y1 + "px";
+  line.style.left = startX + "px";
+  line.style.top = startY + "px";
   line.style.transformOrigin = "0 0";
   line.style.transform = `rotate(${angle}deg)`;
 
   map.appendChild(line);
 }
+  
 function zoomTo(x, y) {
   const centerX = window.innerWidth / 2;
   const centerY = window.innerHeight / 2;
@@ -168,6 +189,7 @@ function zoomTo(x, y) {
 data.children.forEach((node, i) => {
   createNode(node, window.innerWidth / 2, 150);
 });
+
 </script>
 
 </body>
