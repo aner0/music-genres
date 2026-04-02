@@ -20,6 +20,7 @@
     }
 
     .node {
+      z-index: 2;
       position: absolute;
       padding: 16px 26px; /* bigger body */
       background: #2a2a2a;
@@ -47,7 +48,7 @@
     }
     
     line {
-      background: #555;
+      z-index: 1;
     }
   </style>
 
@@ -70,16 +71,16 @@ const data = {
           desc: "Dark, atmospheric metal",
           color: "#3b0a45",
           children: [
-            { name: "NSBM", desc: "Problematic and a nazi subgenre",
-             name: "DSBM", desc: "Depressive suicidal black metal" }
+            {name: "NSBM", desc: "Problematic and a nazi subgenre"},
+            {name: "DSBM", desc: "Depressive suicidal black metal" }
           ]
         },
         {
           name: "Death Metal", desc: "Brutal and fast",
           color: "#3b0a45",
           children: [
-            { name: "BDM", desc: "Brutal death metal",
-             name: "OSDM", desc: "Old school death metal" 
+            { name: "BDM", desc: "Brutal death metal"},
+            {name: "OSDM", desc: "Old school death metal"}
             }
           ]
         }
@@ -154,6 +155,8 @@ function expand(node, x, y, level, parentEl) {
     };
   });
 }
+
+
   
 function drawLine(x1, y1, x2, y2, parentEl, childEl) {
   const rect1 = parentEl.getBoundingClientRect();
@@ -171,11 +174,18 @@ function drawLine(x1, y1, x2, y2, parentEl, childEl) {
 
   const length = Math.hypot(endX - startX, endY - startY);
   const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
-
+  
+  setTimeout(() => {
+    drawLine(x, y, newX, newY, parentEl, childEl);
+  }, 10);
+  
+  line.className = "line";
   line.style.position = "absolute";
   line.style.width = length + "px";
   line.style.height = "2px";
   line.style.background = "#666";
+  line.style.opacity = "0.6";
+  line.style.borderRadius = "2px";
   line.style.left = startX + "px";
   line.style.top = startY + "px";
   line.style.transformOrigin = "0 0";
