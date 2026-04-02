@@ -77,57 +77,55 @@ const data = {
            {name:"Folk metal"}
          ]
         },
-        {
-          name: "Doom",
-          desc: "DA BEST GENRE",
-          chlidren: [
-            {name: "Drone"},{name:"Stoner"},{name:"Sludge"},{name:"Funeral"}
-          ]
+        
+        {name: "Doom",
+         desc: "DA BEST GENRE",
+         chlidren: [
+           {name: "Drone"},{name:"Stoner"},{name:"Sludge"},{name:"Funeral"}
+         ]
         },
         
-        {
-          name: "Black",
-          desc: "what do i write here",
-          color: "#3b0a45",
-          children: [
-            {name: "Raw black metal",
+        {name: "Black",
+         desc: "what do i write here",
+         color: "#3b0a45",
+         children: [
+           {name: "Raw black metal",
+            children: [
+              {name: "Dungeon synth", children: [{name:"Keller synth"}
+            ]
+           },
+           {name:"Symphonic"},
+           {name:"Blackgaze"},
+           {name:"Post-black"},
+           {name:"War metal"},
+           {name:"Viking metal"},
+           {name: "NSBM", desc: "National-socialist black metal(problematic)"},
+           {name: "DSBM", desc: "Depressive suicidal black metal",
              children: [
-               {name: "Dungeon synth", children: [{name:"Keller synth"}
+               {name: "Atmospheric DSBM"},
+               {name: "Hysterical DSBM"}
              ]
-            },
-            {name:"Symphonic"},
-            {name:"Blackgaze"},
-            {name:"Post-black"},
-            {name:"War metal"},
-            {name:"Viking metal"},
-            
-            {name: "NSBM", desc: "National-socialist black metal(problematic)"},
-            
-            {
-              name: "DSBM", desc: "Depressive suicidal black metal",
-              children: [
-                {name: "Atmospheric DSBM"},
-                {name: "Hysterical DSBM"}
-              ]
-            }
-          ]
+           }
+         ]
         },
-        {
-          name: "Death", desc: "Brutal and fast!!!!!!!!!",
-          color: "#3b0a45",
-          children: [
-            {name: "BDM", desc: "Brutal death metal"},
-            {name: "OSDM", desc: "Old school death metal"},
-            {name:"Technical"},
-            {name:"Melodic"},
-            {name:"Blackened"},
-            {name:"Death'n'roll"}
-          ]
+           
+        {name: "Death", desc: "Brutal and fast!!!!!!!!!",
+         color: "#3b0a45",
+         children: [
+           {name: "BDM", desc: "Brutal death metal"},
+           {name: "OSDM", desc: "Old school death metal"},
+           {name:"Technical"},
+           {name:"Melodic"},
+           {name:"Blackened"},
+           {name:"Death'n'roll"}
+         ]
         },
+           
         {name: "Thrash",
          children: [ {name:"Groove"},{name:"Crossover"},{name:"Extreme metal"}
          ]
         },
+           
         {name: "Metalcore", 
          children: [
            {name:"Deathcore"},
@@ -138,7 +136,7 @@ const data = {
       ]
     },
   ]
-};
+  }
 
 const map = document.getElementById("map");
 
