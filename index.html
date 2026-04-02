@@ -69,12 +69,26 @@ const data = {
       desc: "Heavy music",
       children: [
         {
+          name: "Doom Metal",
+          desc: "DA BEST SUBGENRE",
+        }
+        {
           name: "Black Metal",
           desc: "Dark, atmospheric metal",
           color: "#3b0a45",
           children: [
+            {name: "Raw b
+
+            
             {name: "NSBM", desc: "Problematic and a nazi subgenre"},
-            {name: "DSBM", desc: "Depressive suicidal black metal" }
+            
+            {
+              name: "DSBM", desc: "Depressive suicidal black metal",
+              children: [
+                {name: "Atmospheric DSBM"}
+                {name: "Hysterical DSBM"}
+              ]
+            }
           ]
         },
         {
@@ -168,11 +182,11 @@ function drawLine(x1, y1, x2, y2, parentEl, childEl) {
   const mapRect = map.getBoundingClientRect();
   const scale = 1.2; // same as zoom
 
-  const startX = (rect1.left + rect1.width / 2 - mapRect.left) / scale;
-  const startY = (rect1.top + rect1.height / 2 - mapRect.top) / scale;
+  const startX = rect1.left + rect1.width / 2 - mapRect.left;
+  const startY = rect1.top + rect1.height - mapRect.top;
 
-  const endX = (rect2.left + rect2.width / 2 - mapRect.left) / scale;
-  const endY = (rect2.top + rect2.height / 2 - mapRect.top) / scale;
+  const endX = rect2.left + rect2.width / 2 - mapRect.left;
+  const endY = rect2.top; - mapRect.top;
 
   const line = document.createElement("div");
 
