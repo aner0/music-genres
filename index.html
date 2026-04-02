@@ -27,14 +27,16 @@
       border-radius: 14px;
       cursor: pointer;
       transition: 0.25s;
-
+      box-shadow: 0 0 12px rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
       border: 1px solid #555; /* thin border */
     }
 
     .node:hover {
       background: #3a3a3a;
-      border-color: #888;
+      border-color: #aaa;
       transform: scale(1.08);
+      box-shadow: 0 0 15px rgba(255,255,255,0.15);
     }
 
     .tooltip {
@@ -143,7 +145,9 @@ function expand(node, x, y, level, parentEl) {
 
     const childEl = createNode(child, newX, newY, level + 1);
 
-    drawLine(x, y, newX, newY, parentEl, childEl);
+    setTimeout(() => {
+      drawLine(x, y, newX, newY, parentEl, childEl);
+    }, 10);
 
     // only zoom if it HAS children
     childEl.onclick = () => {
@@ -162,28 +166,25 @@ function drawLine(x1, y1, x2, y2, parentEl, childEl) {
   const rect2 = childEl.getBoundingClientRect();
 
   const mapRect = map.getBoundingClientRect();
+  const scale = 1.2; // same as zoom
 
-  const startX = rect1.left + rect1.width / 2 - mapRect.left;
-  const startY = rect1.top + rect1.height / 2 - mapRect.top;
+  const startX = (rect1.left + rect1.width / 2 - mapRect.left) / scale;
+  const startY = (rect1.top + rect1.height / 2 - mapRect.top) / scale;
 
-  const endX = rect2.left + rect2.width / 2 - mapRect.left;
-  const endY = rect2.top + rect2.height / 2 - mapRect.top;
+  const endX = (rect2.left + rect2.width / 2 - mapRect.left) / scale;
+  const endY = (rect2.top + rect2.height / 2 - mapRect.top) / scale;
 
   const line = document.createElement("div");
 
   const length = Math.hypot(endX - startX, endY - startY);
   const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
   
-  setTimeout(() => {
-    drawLine(x, y, newX, newY, parentEl, childEl);
-  }, 10);
-  
   line.className = "line";
   line.style.position = "absolute";
   line.style.width = length + "px";
   line.style.height = "2px";
   line.style.background = "#666";
-  line.style.opacity = "0.6";
+  line.style.opacity = "0.7";
   line.style.borderRadius = "2px";
   line.style.left = startX + "px";
   line.style.top = startY + "px";
