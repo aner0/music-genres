@@ -48,10 +48,6 @@
       display: none;
       white-space: nowrap;
     }
-    
-    line {
-      z-index: 1;
-    }
   </style>
 
 </head>
@@ -68,75 +64,71 @@ const data = {
       name: "Metal",
       desc: "Heavy music ig bruh",
       children: [
-        {name: "Heavy",
-         children: [
-           {name:"Power metal"},
-           {name:"Speed metal"},
-           {name:"Glam"},
-           {name:"Gothic"},
-           {name:"Folk metal"}
-         ]
+        {
+          name: "Heavy",
+          children: [
+            {name:"Power metal"},{name:"Speed metal"},{name:"Glam"},{name:"Gothic"},{name:"Folk metal"}
+          ]
         },
         
-        {name: "Doom",
-         desc: "DA BEST GENRE",
-         chlidren: [
-           {name: "Drone"},{name:"Stoner"},{name:"Sludge"},{name:"Funeral"}
-         ]
+        {
+          name: "Doom",
+          desc: "DA BEST GENRE",
+          children: [
+            {name: "Drone"},{name:"Stoner"},{name:"Sludge"},{name:"Funeral"}
+          ]
         },
         
-        {name: "Black",
-         desc: "what do i write here",
-         color: "#3b0a45",
-         children: [
-           {name: "Raw black metal",
-            children: [
-              {name: "Dungeon synth", children: [{name:"Keller synth"}
-            ]
-           },
-           {name:"Symphonic"},
-           {name:"Blackgaze"},
-           {name:"Post-black"},
-           {name:"War metal"},
-           {name:"Viking metal"},
-           {name: "NSBM", desc: "National-socialist black metal(problematic)"},
-           {name: "DSBM", desc: "Depressive suicidal black metal",
-             children: [
-               {name: "Atmospheric DSBM"},
-               {name: "Hysterical DSBM"}
-             ]
-           }
-         ]
+        {
+          name: "Black",
+          desc: "what do i write here",
+          color: "#3b0a45",
+          children: [
+            {name: "Raw black metal", children: [{name: "Dungeon synth", children: [{name:"Keller synth"}]}]},
+            {name:"Symphonic"},
+            {name:"Blackgaze"},
+            {name:"Post-black"},
+            {name:"War metal"},
+            {name:"Viking metal"},
+            {name: "NSBM", desc: "National-socialist black metal(problematic)"},
+            {name: "DSBM", desc: "Depressive suicidal black metal", children: [{name: "Atmospheric DSBM"},{name: "Hysterical DSBM"}]}
+          ]
         },
            
-        {name: "Death", desc: "Brutal and fast!!!!!!!!!",
-         color: "#3b0a45",
-         children: [
-           {name: "BDM", desc: "Brutal death metal"},
-           {name: "OSDM", desc: "Old school death metal"},
-           {name:"Technical"},
-           {name:"Melodic"},
-           {name:"Blackened"},
-           {name:"Death'n'roll"}
-         ]
+        {
+          name: "Death", desc: "Brutal and fast!!!!!!!!!",
+          color: "#3b0a45",
+          children: [
+            {name: "BDM", desc: "Brutal death metal"},
+            {name: "OSDM", desc: "Old school death metal"},
+            {name:"Technical"},
+            {name:"Melodic"},
+            {name:"Blackened"},
+            {name:"Death'n'roll"}
+          ]
         },
            
-        {name: "Thrash",
-         children: [ {name:"Groove"},{name:"Crossover"},{name:"Extreme metal"}
-         ]
+        {
+          name: "Thrash",
+          children: [
+            {name:"Groove"},
+            {name:"Crossover"},
+            {name:"Extreme metal"}
+          ]
         },
            
-        {name: "Metalcore", 
-         children: [
-           {name:"Deathcore"},
-           {name:"Mathcore"},
-           {name:"Progressive metalcore"}
-         ]
+        {
+          name: "Metalcore", 
+          children: [
+            {name:"Deathcore"},
+            {name:"Mathcore"},
+            {name:"Progressive metalcore"}
+          ]
         }
       ]
     },
   ]
-  }
+  };
 
 const map = document.getElementById("map");
 
@@ -220,7 +212,7 @@ function drawLine(x1, y1, x2, y2, parentEl, childEl) {
   const startY = rect1.top + rect1.height - mapRect.top;
 
   const endX = rect2.left + rect2.width / 2 - mapRect.left;
-  const endY = rect2.top; - mapRect.top;
+  const endY = rect2.top - mapRect.top;
 
   const line = document.createElement("div");
 
