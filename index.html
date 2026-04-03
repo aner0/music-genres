@@ -55,6 +55,7 @@
 <div id="map"></div>
 
 <script>
+const allNodes = [];
 const data = {
   name: "Metal",
   children: [
@@ -83,6 +84,8 @@ function createNode(node, x, y) {
   el.innerText = node.name;
   el.style.left = x + "px";
   el.style.top = y + "px";
+  
+  allNodes.push(el);
 
   map.appendChild(el);
 
@@ -93,6 +96,28 @@ function createNode(node, x, y) {
   };
 
   return el;
+}
+function resolveOverlap(el) {
+  const rect1 = el.getBoundingClientRect();
+
+  allNodes.forEach(other => {
+    if (other === el) return;
+
+    const rect2 = other.getBoundingClientRect();
+
+    const overlap =
+      !(rect1.right < rect2.left ||
+        rect1.left > rect2.right ||
+        rect1.bottom < rect2.top ||
+        rect1.top > rect2.bottom);
+
+    if (overlap) {
+      // push right
+      const shift = rect2.right - rect1.left + 20;
+      const currentLeft = parseFloat(el.style.left);
+      el.style.left = currentLeft + shift + "px";
+    }
+  });
 }
 function removeChildren(parentEl) {
   const allNodes = document.querySelectorAll(".node");
@@ -112,6 +137,12 @@ function removeChildren(parentEl) {
   });
 }
 function expand(node, x, y, parentEl, level = 0) {
+  const childEl = createNode(child, newX, newY);
+
+  setTimeout(() => {
+    resolveOverlap(childEl);
+    drawLine(parentEl, childEl);
+  }, 10);
   const count = node.children.length;
 
   const spacingX = 160;
