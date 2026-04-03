@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Genre Map</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #1e1e1e;
+      overflow: hidden;
+      font-family: Arial;
+      color: white;
+    }
+
+    #map {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      transition: transform 0.5s ease;
+    }
+
+    .node {
+      position: absolute;
+      padding: 10px 16px;
+      font-size: 14px;
+      background: #2a2a2a;
+      border-radius: 10px;
+      border: 1px solid #555;
+      cursor: pointer;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .node:hover {
+      background: #3a3a3a;
+    }
+
+
+    .tooltip {
+      position: absolute;
+      background: black;
+      padding: 5px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      display: none;
+      white-space: nowrap;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<script>
+const data = {
+  name: "Metal",
+  children: [
+    {
+      name: "Black",
+      children: [
+        { name: "DSBM" },
+        { name: "Symphonic" }
+      ]
+    },
+    {
+      name: "Death",
+      children: [
+        { name: "BDM" },
+        { name: "OSDM" }
+      ]
+    }
+  ]
+};
+
+const map = document.getElementById("map");
+
+function createNode(node, x, y) {
+  const el = document.createElement("div");
+  el.className = "node";
+  el.innerText = node.name;
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+
+  map.appendChild(el);
+
+  el.onclick = () => {
+    if (node.children && !el.expanded) {
+      el.expanded = true;
+      expand(node, x, y, el);
+    }
+  };
+
+  return el;
+}
+
+function expand(node, x, y, parentEl) {
+  const count = node.children.length;
+
+  const spacingX = 160; // stable spacing
+  const spacingY = 120;
+
+  const totalWidth = (count - 1) * spacingX;
+
+  node.children.forEach((child, i) => {
+    const newX = x - totalWidth / 2 + i * spacingX;
+    const newY = y + spacingY;
+
+    const childEl = createNode(child, newX, newY);
+
+    drawLine(parentEl, childEl);
+  });
+}
+
+function drawLine(parentEl, childEl) {
+  const rect1 = parentEl.getBoundingClientRect();
+  const rect2 = childEl.getBoundingClientRect();
+  const mapRect = map.getBoundingClientRect();
+
+  const startX = rect1.left + rect1.width / 2 - mapRect.left;
+  const startY = rect1.top + rect1.height - mapRect.top;
+
+  const endX = rect2.left + rect2.width / 2 - mapRect.left;
+  const endY = rect2.top - mapRect.top;
+
+  const line = document.createElement("div");
+
+  const length = Math.hypot(endX - startX, endY - startY);
+  const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+
+  line.style.position = "absolute";
+  line.style.width = length + "px";
+  line.style.height = "2px";
+  line.style.background = "#666";
+  line.style.left = startX + "px";
+  line.style.top = startY + "px";
+  line.style.transformOrigin = "0 0";
+  line.style.transform = `rotate(${angle}deg)`;
+
+  map.appendChild(line);
+}
+
+// start
+createNode(data, window.innerWidth / 2, 100);
+</script>
+
+</body>
+</html>
