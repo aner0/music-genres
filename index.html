@@ -20,16 +20,19 @@
     }
 
     .node {
-      z-index: 2;
-      position: absolute;
-      padding: 16px 26px; /* bigger body */
+      padding: 8px 14px;       /* меньше отступы */
+      max-width: 150px;        /* ограничение ширины */
+      white-space: normal;     /* перенос текста */
+      font-size: 14px;
+      /* остальные ваши стили: */
       background: #2a2a2a;
       border-radius: 14px;
       cursor: pointer;
+      border: 1px solid #555;
       transition: 0.25s;
       box-shadow: 0 0 12px rgba(0,0,0,0.5);
       backdrop-filter: blur(4px);
-      border: 1px solid #555; /* thin border */
+      z-index: 2;
     }
 
     .node:hover {
@@ -38,6 +41,7 @@
       transform: scale(1.08);
       box-shadow: 0 0 15px rgba(255,255,255,0.15);
     }
+
 
     .tooltip {
       position: absolute;
@@ -139,6 +143,7 @@ function createNode(node, x, y, level = 0) {
   el.style.left = x + "px";
   el.style.top = y + "px";
 
+  
   // Tooltip
   const tooltip = document.createElement("div");
   tooltip.className = "tooltip";
@@ -171,25 +176,50 @@ function createNode(node, x, y, level = 0) {
   return el;
 }
 
+let isDragging = false;
+let startDragX, startDragY;
+let currentX = 0, currentY = 0;
+
+map.addEventListener("mousedown", (e) => {
+  isDragging = true;
+  startDragX = e.clientX - currentX;
+  startDragY = e.clientY - currentY;
+});
+window.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+  currentX = e.clientX - startDragX;
+  currentY = e.clientY - startDragY;
+  map.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.2)`;
+});
+window.addEventListener("mouseup", () => {
+  isDragging = false;
+});
+
+  
 function expand(node, x, y, level, parentEl) {
+  if (parentEl.expanded) return; 
+  parentEl.expanded = true;
+  
   if (!node.children) return;
 
-  const spacingX = 180;
+  // Новое: динамическое расстояние по X
+  const baseSpacing = 300;
+  const count = node.children.length;
+  const spacingX = Math.max(120, baseSpacing / count);
   const spacingY = 140;
 
-  const totalWidth = (node.children.length - 1) * spacingX;
-
+  const totalWidth = (count - 1) * spacingX;
+  
   node.children.forEach((child, i) => {
     const newX = x - totalWidth / 2 + i * spacingX;
     const newY = y + spacingY;
-
     const childEl = createNode(child, newX, newY, level + 1);
 
     setTimeout(() => {
       drawLine(x, y, newX, newY, parentEl, childEl);
     }, 10);
 
-    // only zoom if it HAS children
+    // предотвратим дублирование ветви при повторном клике:
     childEl.onclick = () => {
       if (child.children) {
         expand(child, newX, newY, level + 1, childEl);
@@ -200,39 +230,40 @@ function expand(node, x, y, level, parentEl) {
 }
 
 
+
   
 function drawLine(x1, y1, x2, y2, parentEl, childEl) {
   const rect1 = parentEl.getBoundingClientRect();
   const rect2 = childEl.getBoundingClientRect();
-
   const mapRect = map.getBoundingClientRect();
-  const scale = 1.2; // same as zoom
 
+  // Начальная точка чуть ниже блока:
   const startX = rect1.left + rect1.width / 2 - mapRect.left;
-  const startY = rect1.top + rect1.height - mapRect.top;
+  const startY = rect1.top + rect1.height + 2 - mapRect.top;
 
   const endX = rect2.left + rect2.width / 2 - mapRect.left;
   const endY = rect2.top - mapRect.top;
 
   const line = document.createElement("div");
-
-  const length = Math.hypot(endX - startX, endY - startY);
-  const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
-  
   line.className = "line";
   line.style.position = "absolute";
+  const length = Math.hypot(endX - startX, endY - startY);
+  const angle = Math.atan2(endY - startY, endX - startX) * (180 / Math.PI);
+
   line.style.width = length + "px";
   line.style.height = "2px";
-  line.style.background = "#666";
+  line.style.background = "linear-gradient(to right, #888, #444)";
   line.style.opacity = "0.7";
   line.style.borderRadius = "2px";
   line.style.left = startX + "px";
   line.style.top = startY + "px";
   line.style.transformOrigin = "0 0";
   line.style.transform = `rotate(${angle}deg)`;
+  line.style.zIndex = 1; // линия позади кнопок
 
   map.appendChild(line);
 }
+
   
 function zoomTo(x, y) {
   const centerX = window.innerWidth / 2;
