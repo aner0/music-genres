@@ -62,15 +62,62 @@ const data = {
     {
       name: "Black",
       children: [
+        { name: "Raw" },
+        { name: "Symphonic" },
+        { name: "Atmospheric" },
+        { name: "War metal" },
+        { name: "Viking metal" },
+        { name: "Blackgaze" },
+        { name: "Post-black" },
+        { name: "Folk" },
         { name: "DSBM" },
-        { name: "Symphonic" }
+        { name: "NSBM" }
       ]
     },
     {
       name: "Death",
       children: [
-        { name: "BDM" },
-        { name: "OSDM" }
+        { name: "Brutal" },
+        { name: "Technical" },
+        { name: "Death'n'roll" },
+        { name: "Blackened" },
+        { name: "Symphonic" },
+        { name: "Old-school" }
+      ]
+    },
+    {
+      name: "Heavy",
+      children: [
+        { name: "Speed metal" },
+        { name: "Glam metal" },
+        { name: "Power metal" },
+        { name: "Folk metal" }
+      ]
+    },
+    {
+      name: "Doom",
+      children: [
+        { name: "Drone" },
+        { name: "Sludge" },
+        { name: "Stoner" },
+        { name: "Deathdoom" },
+        { name: "Funeral" }
+      ]
+    },
+    {
+      name: "Thrash",
+      children: [
+        { name: "Groove" },
+        { name: "Crossover" },
+        { name: "Extreme metal" }
+      ]
+    },
+    {
+      name: "Metalcore",
+      children: [
+        { name: "Mathcore" },
+        { name: "Deathcore" },
+        { name: "Progressive" }
       ]
     }
   ]
@@ -97,27 +144,30 @@ function createNode(node, x, y) {
 
   return el;
 }
-function resolveOverlap(el) {
-  const rect1 = el.getBoundingClientRect();
+function resolveAllOverlaps() {
+  for (let i = 0; i < allNodes.length; i++) {
+    for (let j = i + 1; j < allNodes.length; j++) {
+      const a = allNodes[i];
+      const b = allNodes[j];
 
-  allNodes.forEach(other => {
-    if (other === el) return;
+      const rect1 = a.getBoundingClientRect();
+      const rect2 = b.getBoundingClientRect();
 
-    const rect2 = other.getBoundingClientRect();
+      const overlap =
+        !(rect1.right < rect2.left ||
+          rect1.left > rect2.right ||
+          rect1.bottom < rect2.top ||
+          rect1.top > rect2.bottom);
 
-    const overlap =
-      !(rect1.right < rect2.left ||
-        rect1.left > rect2.right ||
-        rect1.bottom < rect2.top ||
-        rect1.top > rect2.bottom);
+      if (overlap) {
+        // push BOTH nodes apart (not just one)
+        const shift = 20;
 
-    if (overlap) {
-      // push right
-      const shift = rect2.right - rect1.left + 20;
-      const currentLeft = parseFloat(el.style.left);
-      el.style.left = currentLeft + shift + "px";
+        a.style.left = (parseFloat(a.style.left) - shift) + "px";
+        b.style.left = (parseFloat(b.style.left) + shift) + "px";
+      }
     }
-  });
+  }
 }
 function removeChildren(parentEl) {
   const nodes = document.querySelectorAll(".node");
@@ -155,7 +205,7 @@ function expand(node, x, y, parentEl, level = 0) {
 
     // 👉 IMPORTANT: delay AFTER node is in DOM
     setTimeout(() => {
-      resolveOverlap(childEl);
+      resolveAllOverlaps();
       drawLine(parentEl, childEl);
     }, 10);
 
