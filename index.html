@@ -33,6 +33,8 @@
       box-shadow: 0 0 12px rgba(0,0,0,0.5);
       backdrop-filter: blur(4px);
       z-index: 2;
+      text-align: center;
+      line-height: 1.2;
     }
 
     .node:hover {
@@ -133,7 +135,7 @@ const data = {
     },
   ]
   };
-
+  
 const map = document.getElementById("map");
 
 function createNode(node, x, y, level = 0) {
@@ -179,22 +181,24 @@ function createNode(node, x, y, level = 0) {
 let isDragging = false;
 let startDragX, startDragY;
 let currentX = 0, currentY = 0;
+let scale = 1.2;
+let offsetX = 0;
+let offsetY = 0;
 
 map.addEventListener("mousedown", (e) => {
   isDragging = true;
-  startDragX = e.clientX - currentX;
-  startDragY = e.clientY - currentY;
-});
-window.addEventListener("mousemove", (e) => {
-  if (!isDragging) return;
-  currentX = e.clientX - startDragX;
-  currentY = e.clientY - startDragY;
-  map.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.2)`;
-});
-window.addEventListener("mouseup", () => {
-  isDragging = false;
+  startDragX = e.clientX - offsetX;
+  startDragY = e.clientY - offsetY;
 });
 
+window.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+
+  offsetX = e.clientX - startDragX;
+  offsetY = e.clientY - startDragY;
+
+  updateTransform();
+});
   
 function expand(node, x, y, level, parentEl) {
   if (parentEl.expanded) return; 
@@ -205,8 +209,8 @@ function expand(node, x, y, level, parentEl) {
   // Новое: динамическое расстояние по X
   const baseSpacing = 300;
   const count = node.children.length;
-  const spacingX = Math.max(120, baseSpacing / count);
-  const spacingY = 140;
+  const spacingX = Math.max(120, Math.min(220, 800 / count));
+  const spacingY = 120 + level * 10;
 
   const totalWidth = (count - 1) * spacingX;
   
@@ -260,19 +264,23 @@ function drawLine(x1, y1, x2, y2, parentEl, childEl) {
   line.style.transformOrigin = "0 0";
   line.style.transform = `rotate(${angle}deg)`;
   line.style.zIndex = 1; // линия позади кнопок
+  line.style.opacity = "0.5";
 
   map.appendChild(line);
 }
 
+function updateTransform() {
+  map.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+}
   
 function zoomTo(x, y) {
   const centerX = window.innerWidth / 2;
   const centerY = window.innerHeight / 2;
 
-  const offsetX = centerX - x;
-  const offsetY = centerY - y;
+  offsetX = centerX - x;
+  offsetY = centerY - y;
 
-  map.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(1.2)`;
+  updateTransform();
 }
 
 // Initial nodes
