@@ -29,6 +29,7 @@
       cursor: pointer;
       text-align: center;
       z-index: 2;
+      min-width: 80px;
     }
 
     .node:hover {
@@ -86,33 +87,65 @@ function createNode(node, x, y) {
   map.appendChild(el);
 
   el.onclick = () => {
-    if (node.children && !el.expanded) {
-      el.expanded = true;
-      expand(node, x, y, el);
+    if (node.children) {
+      toggle(node, x, y, el, 0);
     }
   };
 
   return el;
 }
+function removeChildren(parentEl) {
+  const allNodes = document.querySelectorAll(".node");
+  const allLines = document.querySelectorAll(".line");
 
-function expand(node, x, y, parentEl) {
+  allNodes.forEach(n => {
+    if (n.parent === parentEl) {
+      removeChildren(n);
+      n.remove();
+    }
+  });
+
+  allLines.forEach(l => {
+    if (l.parent === parentEl) {
+      l.remove();
+    }
+  });
+}
+function expand(node, x, y, parentEl, level = 0) {
   const count = node.children.length;
 
-  const spacingX = 160; // stable spacing
+  const spacingX = 160;
   const spacingY = 120;
 
   const totalWidth = (count - 1) * spacingX;
 
   node.children.forEach((child, i) => {
-    const newX = x - totalWidth / 2 + i * spacingX;
+    // 👇 KEY PART (adds sideways shift)
+    const offset = level * 60;
+
+    const newX = x - totalWidth / 2 + i * spacingX + offset;
     const newY = y + spacingY;
 
     const childEl = createNode(child, newX, newY);
-
+    childEl.parent = parentEl;
     drawLine(parentEl, childEl);
+
+    childEl.onclick = () => {
+      if (child.children) {
+        toggle(child, newX, newY, childEl, level + 1);
+      }
+    };
   });
 }
-
+function toggle(node, x, y, el, level) {
+  if (el.expanded) {
+    removeChildren(el);
+    el.expanded = false;
+  } else {
+    el.expanded = true;
+    expand(node, x, y, el, level);
+  }
+}
 function drawLine(parentEl, childEl) {
   const rect1 = parentEl.getBoundingClientRect();
   const rect2 = childEl.getBoundingClientRect();
@@ -137,6 +170,8 @@ function drawLine(parentEl, childEl) {
   line.style.top = startY + "px";
   line.style.transformOrigin = "0 0";
   line.style.transform = `rotate(${angle}deg)`;
+  line.parent = parentEl;
+  line.className = "line";
 
   map.appendChild(line);
 }
