@@ -120,7 +120,7 @@ function resolveOverlap(el) {
   });
 }
 function removeChildren(parentEl) {
-  const allNodes = document.querySelectorAll(".node");
+  const nodes = document.querySelectorAll(".node");
   const allLines = document.querySelectorAll(".line");
 
   allNodes.forEach(n => {
@@ -137,21 +137,14 @@ function removeChildren(parentEl) {
   });
 }
 function expand(node, x, y, parentEl, level = 0) {
-  const childEl = createNode(child, newX, newY);
+  if (!node.children) return;
 
-  setTimeout(() => {
-    resolveOverlap(childEl);
-    drawLine(parentEl, childEl);
-  }, 10);
   const count = node.children.length;
-
   const spacingX = 160;
   const spacingY = 120;
-
   const totalWidth = (count - 1) * spacingX;
 
   node.children.forEach((child, i) => {
-    // 👇 KEY PART (adds sideways shift)
     const offset = level * 60;
 
     const newX = x - totalWidth / 2 + i * spacingX + offset;
@@ -159,7 +152,12 @@ function expand(node, x, y, parentEl, level = 0) {
 
     const childEl = createNode(child, newX, newY);
     childEl.parent = parentEl;
-    drawLine(parentEl, childEl);
+
+    // 👉 IMPORTANT: delay AFTER node is in DOM
+    setTimeout(() => {
+      resolveOverlap(childEl);
+      drawLine(parentEl, childEl);
+    }, 10);
 
     childEl.onclick = () => {
       if (child.children) {
