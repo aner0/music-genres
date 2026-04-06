@@ -16,15 +16,14 @@
       position: relative;
       width: 100vw;
       height: 100vh;
-      transition: transform 0.5s ease;
     }
 
     .node {
       position: absolute;
-      padding: 10px 16px;
-      font-size: 14px;
+      padding: 6px 10px;
+      font-size: 13px;
       background: #2a2a2a;
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1px solid #555;
       cursor: pointer;
       text-align: center;
@@ -57,74 +56,114 @@
 <script>
 const allNodes = [];
 const data = {
-  name: "Metal",
+  name: "Genres",
   children: [
     {
-      name: "Black",
+      name: "Metal",
       children: [
-        { name: "Raw" },
-        { name: "Symphonic" },
-        { name: "Atmospheric" },
-        { name: "War metal" },
-        { name: "Viking metal" },
-        { name: "Blackgaze" },
-        { name: "Post-black" },
-        { name: "Folk" },
-        { name: "DSBM" },
-        { name: "NSBM" }
+        {
+          name: "Black", children: [
+            { name: "Raw" },
+            { name: "Symphonic" },
+            { name: "Atmospheric" },
+            { name: "War metal" },
+            { name: "Viking metal" },
+            { name: "Blackgaze" },
+            { name: "Post-black" },
+            { name: "Folk" },
+            { name: "DSBM" },
+            { name: "NSBM" }
+          ]
+        },
+        {
+          name: "Death", children: [
+            { name: "Brutal" },
+            { name: "Technical" },
+            { name: "Death'n'roll" },
+            { name: "Blackened" },
+            { name: "Symphonic" },
+            { name: "Old-school" }
+          ]
+        },
+        {
+          name: "Heavy", children: [
+            { name: "Speed metal" },
+            { name: "Glam metal" },
+            { name: "Power metal" },
+            { name: "Folk metal" }
+            ]
+        },
+        {
+          name: "Doom", children: [
+            { name: "Drone" },
+            { name: "Sludge" },
+            { name: "Stoner" },
+            { name: "Deathdoom" },
+            { name: "Funeral" }
+          ]
+        },
+        {
+          name: "Thrash",
+          children: [
+            { name: "Groove" },
+            { name: "Crossover" },
+            { name: "Extreme metal" }
+          ]
+        },
+        {
+          name: "Metalcore", children: [
+            { name: "Mathcore" },
+            { name: "Deathcore" },
+            { name: "Progressive" }
+          ]
+        }
       ]
     },
     {
-      name: "Death",
+      name: "Punk",
       children: [
-        { name: "Brutal" },
-        { name: "Technical" },
-        { name: "Death'n'roll" },
-        { name: "Blackened" },
-        { name: "Symphonic" },
-        { name: "Old-school" }
+        { name: "Hardcore" },
+        { name: "Pop Punk" }
       ]
     },
     {
-      name: "Heavy",
+      name: "Electronic",
       children: [
-        { name: "Speed metal" },
-        { name: "Glam metal" },
-        { name: "Power metal" },
-        { name: "Folk metal" }
-      ]
-    },
-    {
-      name: "Doom",
-      children: [
-        { name: "Drone" },
-        { name: "Sludge" },
-        { name: "Stoner" },
-        { name: "Deathdoom" },
-        { name: "Funeral" }
-      ]
-    },
-    {
-      name: "Thrash",
-      children: [
-        { name: "Groove" },
-        { name: "Crossover" },
-        { name: "Extreme metal" }
-      ]
-    },
-    {
-      name: "Metalcore",
-      children: [
-        { name: "Mathcore" },
-        { name: "Deathcore" },
-        { name: "Progressive" }
+        { name: "Techno" },
+        { name: "House" },
+        { name: "Ambient" }
       ]
     }
   ]
 };
+  
 
 const map = document.getElementById("map");
 
+let offsetX = 0;
+let offsetY = 0;
+let isDragging = false;
+let startX, startY;
+
+map.addEventListener("mousedown", (e) => {
+  isDragging = true;
+  startX = e.clientX - offsetX;
+  startY = e.clientY - offsetY;
+});
+
+window.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+
+  offsetX = e.clientX - startX;
+  offsetY = e.clientY - startY;
+
+  map.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+});
+
+window.addEventListener("mouseup", () => {
+  isDragging = false;
+});
+  
 function createNode(node, x, y) {
   const el = document.createElement("div");
   el.className = "node";
@@ -191,21 +230,28 @@ function expand(node, x, y, parentEl, level = 0) {
 
   const count = node.children.length;
   const spacingX = 160;
-  const spacingY = 120;
+  const spacingY = 140 + level * 30;
   const totalWidth = (count - 1) * spacingX;
 
   node.children.forEach((child, i) => {
     const offset = level * 60;
 
-    const newX = x - totalWidth / 2 + i * spacingX + offset;
-    const newY = y + spacingY;
+    const perRow = 6; // max nodes per row
+    const row = Math.floor(i / perRow);
+    const col = i % perRow;
+
+    const rowWidth = Math.min(perRow, count) * spacingX;
+    const newX = x - rowWidth / 2 + col * spacingX;
+    const newY = y + spacingY + row * 90; // push rows downward
 
     const childEl = createNode(child, newX, newY);
     childEl.parent = parentEl;
 
     // 👉 IMPORTANT: delay AFTER node is in DOM
     setTimeout(() => {
-      resolveAllOverlaps();
+      for (let i = 0; i < 5; i++) {
+        resolveAllOverlaps();
+      }
       drawLine(parentEl, childEl);
     }, 10);
 
